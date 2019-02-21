@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.story.demo.glplay.R;
@@ -32,14 +33,14 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
     private FloatBuffer vertexBuffer;
 
     private float[] fragmentData = {
-//            0f, 0.5f,
-//            0.5f, 0.5f,
 //            0f, 0f,
-//            0.5f, 0f
-            0f, 0f,
-            1f, 0f,
+//            1f, 0f,
+//            0f, 1f,
+//            1f, 1f
             0f, 1f,
-            1f, 1f
+            1f, 1f,
+            0f, 0f,
+            1f, 0f
     };
     private FloatBuffer fragmentBuffer;
 
@@ -55,6 +56,9 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
     private int imgTextureId;
 
     private FboRender mFboRender;
+
+    private int uMatrix;
+    private float[] matrix = new float[16];
 
     public TextureRender(Context context) {
         this.mContext = context;
@@ -76,7 +80,7 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
     public void onSurfaceCreate() {
 
         mFboRender.onCreate();
-        String vertexSource = ShaderUtil.getRawResource(mContext, R.raw.vertex_shader);
+        String vertexSource = ShaderUtil.getRawResource(mContext, R.raw.vertex_shader_m);
         String fragmentSource = ShaderUtil.getRawResource(mContext, R.raw.fragment_shader);
 
         program = ShaderUtil.createProgram(vertexSource, fragmentSource);
@@ -84,6 +88,7 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
         vPosition = GLES20.glGetAttribLocation(program, "v_Position");
         fPosition = GLES20.glGetAttribLocation(program, "f_Position");
         sampler = GLES20.glGetUniformLocation(program, "sTuxture");
+        uMatrix = GLES20.glGetUniformLocation(program, "u_Matrix");
 
         int[] vbos = new int[1];
         GLES20.glGenBuffers(1, vbos, 0);
@@ -158,6 +163,13 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
     public void onSurfaceChanged(int width, int height) {
         GLES20.glViewport(0, 0, width, height);
         mFboRender.onChange(width, height);
+
+        if (width > height) {
+            Matrix.orthoM(matrix, 0, -width/ ((height / 702f) * 526f), width/ ((height / 702f) * 526f), -1f, 1f, -1f, 1f);
+        } else {
+            Matrix.orthoM(matrix, 0, -1f, 1f, -height/ ((width / 526f) * 702f), height/ ((width / 526f) * 702f), -1f, 1f);
+        }
+        Matrix.rotateM(matrix, 0, 180, 1, 0, 0);
     }
 
     @Override
@@ -167,6 +179,8 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
         GLES20.glClearColor(1f, 0f, 0f, 1f);
 
         GLES20.glUseProgram(program);
+
+        GLES20.glUniformMatrix4fv(uMatrix, 1, false, matrix, 0);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, imgTextureId);
 
