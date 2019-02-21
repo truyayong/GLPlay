@@ -60,6 +60,12 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
     private int uMatrix;
     private float[] matrix = new float[16];
 
+    private OnRenderCreateListener mOnRenderCreateListener;
+
+    public void setOnRenderCreateListener(OnRenderCreateListener listener) {
+        this.mOnRenderCreateListener = listener;
+    }
+
     public TextureRender(Context context) {
         this.mContext = context;
         mFboRender = new FboRender(context);
@@ -108,6 +114,7 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
         int[] textureIds = new int[1];
         GLES20.glGenTextures(1, textureIds, 0);
         textureId = textureIds[0];
+        Log.e(TAG, "textureId : " + textureId);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
 
@@ -139,6 +146,9 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
 //        bitmap.recycle();
 //        bitmap = null;
 //        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+        if (mOnRenderCreateListener != null) {
+            mOnRenderCreateListener.onCreate(textureId);
+        }
     }
 
     private int loadtexture(int src) {
@@ -200,5 +210,9 @@ public class TextureRender implements PEGLSurfaceView.PGLRender {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         mFboRender.onDraw(textureId);
+    }
+
+    public interface OnRenderCreateListener {
+        void onCreate(int texId);
     }
 }

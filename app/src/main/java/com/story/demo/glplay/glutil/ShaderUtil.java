@@ -53,7 +53,7 @@ public class ShaderUtil {
             int[] compile = new int[1];
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compile, 0);
             if (compile[0] != GLES20.GL_TRUE) {
-                Log.d(TAG, "shader compile error");
+                Log.e(TAG, "shader compile error : " + GLES20.glGetShaderInfoLog(shader) + " compile : " + compile[0]);
                 GLES20.glDeleteShader(shader);
                 shader = 0;
             }

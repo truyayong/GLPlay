@@ -13,6 +13,8 @@ import com.story.demo.glplay.glutil.TextureRender;
 
 public class TextureSurfaceView extends PEGLSurfaceView {
 
+    private TextureRender mRender;
+
     public TextureSurfaceView(Context context) {
         this(context, null);
     }
@@ -23,6 +25,11 @@ public class TextureSurfaceView extends PEGLSurfaceView {
 
     public TextureSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setRender(new TextureRender(context));
+        mRender = new TextureRender(context);
+        setRender(mRender);
+    }
+
+    public TextureRender getRender() {
+        return mRender;
     }
 }

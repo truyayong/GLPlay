@@ -1,5 +1,6 @@
 package com.story.demo.glplay.glutil;
 
+import android.util.Log;
 import android.view.Surface;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -16,6 +17,7 @@ import static android.opengl.EGL14.EGL_CONTEXT_CLIENT_VERSION;
  */
 
 public class EglHelper {
+    private static final String TAG = "EglHelper";
 
     private EGL10 mEgl;
     private EGLDisplay mEglDisplay;
@@ -23,6 +25,7 @@ public class EglHelper {
     private EGLSurface mEglSurface;
 
     public void initEgl(Surface surface, EGLContext eglContext) {
+        Log.i(TAG, "initEgl surface : " + surface + " eglContext : " + eglContext);
 
         mEgl = (EGL10) EGLContext.getEGL();
 
@@ -66,8 +69,10 @@ public class EglHelper {
         int[] attrib_list = {EGL_CONTEXT_CLIENT_VERSION, 2,
                 EGL10.EGL_NONE };
         if (eglContext != null) {
+            Log.i(TAG, "initEgl eglContext is not null");
             mEglContext = mEgl.eglCreateContext(mEglDisplay, configs[0], eglContext, attrib_list);
         } else {
+            Log.i(TAG, "initEgl eglContext is null");
             mEglContext = mEgl.eglCreateContext(mEglDisplay, configs[0], EGL10.EGL_NO_CONTEXT, attrib_list);
         }
 
